@@ -3,6 +3,10 @@ description:
 globs: 
 alwaysApply: true
 ---
+# deployment
+
+this app is deployed at hetzner.cloud server using Ubuntu.
+
 # main app goul
 
 We have a ai agent at retail he sent the task to this BE to sent it to yieldplanet. or maybe we can skip the be and sent the reservation directly to yieldplanet?

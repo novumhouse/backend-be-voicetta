@@ -27,15 +27,15 @@ jobs:
         run: |
           mkdir -p deploy
           cp -r dist package.json package-lock.json ecosystem.config.js nginx.conf deploy/
-          echo "${{ secrets.DATABASE_URL }}" > deploy/.env
-          echo "NODE_ENV=production" >> deploy/.env
+          echo "NODE_ENV=production" > deploy/.env
           echo "PORT=3000" >> deploy/.env
-          echo "YIELDPLANET_API_URL=${{ secrets.YIELDPLANET_API_URL }}" >> deploy/.env
-          echo "YIELDPLANET_API_KEY=${{ secrets.YIELDPLANET_API_KEY }}" >> deploy/.env
-          echo "YIELDPLANET_API_SECRET=${{ secrets.YIELDPLANET_API_SECRET }}" >> deploy/.env
-          echo "RETELL_WEBHOOK_SECRET=${{ secrets.RETELL_WEBHOOK_SECRET }}" >> deploy/.env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> deploy/.env
+          echo "YIELDPLANET_USERNAME=${{ secrets.YIELDPLANET_USERNAME }}" >> deploy/.env
+          echo "YIELDPLANET_PASSWORD=${{ secrets.YIELDPLANET_PASSWORD }}" >> deploy/.env
+          echo "RETELL_API_KEY=${{ secrets.RETELL_API_KEY }}" >> deploy/.env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> deploy/.env
 
+      # Note: Add the private key content from C:\Users\rafal\.ssh\hetzner_ed25519 to the HETZNER_SSH_KEY secret
       - name: Deploy to Hetzner
         uses: appleboy/ssh-action@master
         with:
@@ -43,12 +43,39 @@ jobs:
           username: ${{ secrets.HETZNER_USERNAME }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
           script: |
+            mkdir -p /var/www/voicetta
+            
+            # Ensure Nginx is installed
+            if ! command -v nginx &> /dev/null; then
+              apt update && apt install -y nginx
+            fi
+            
+            # Ensure PM2 is installed
+            if ! command -v pm2 &> /dev/null; then
+              npm install -g pm2
+            fi
+            
+            # Deploy files
             cd /var/www/voicetta
-            git pull
+            if [ ! -d .git ]; then
+              git clone https://github.com/novumhouse/backend-be-voicetta.git .
+            else
+              git pull
+            fi
+            
+            # Install dependencies
             npm ci --production
+            
+            # Set up Nginx
             cp nginx.conf /etc/nginx/sites-available/voicetta
             ln -sf /etc/nginx/sites-available/voicetta /etc/nginx/sites-enabled/
             rm -f /etc/nginx/sites-enabled/default
+            
+            # Reload Nginx
             nginx -t && systemctl reload nginx
+            
+            # Start/reload application
             pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
-            pm2 save 
+            pm2 save
+            
+            echo "Deployment completed successfully!" 

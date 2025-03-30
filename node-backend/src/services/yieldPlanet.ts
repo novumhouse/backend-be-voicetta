@@ -4,7 +4,7 @@ import { logger } from '../utils/logger';
 interface YieldPlanetConfig {
   credentials?: {
     username?: string;
-    apiKey?: string;
+    password?: string;
   };
   mappings?: {
     roomTypes?: Record<string, string>;
@@ -15,13 +15,13 @@ interface YieldPlanetConfig {
 export class YieldPlanetService {
   private baseUrl = 'https://api.yieldplanet.com/v1.31';
   private username: string;
-  private apiKey: string;
+  private password: string;
 
   constructor(config?: YieldPlanetConfig) {
     this.username = config?.credentials?.username || process.env.YIELDPLANET_USERNAME!;
-    this.apiKey = config?.credentials?.apiKey || process.env.YIELDPLANET_API_KEY!;
+    this.password = config?.credentials?.password || process.env.YIELDPLANET_PASSWORD!;
 
-    if (!this.username || !this.apiKey) {
+    if (!this.username || !this.password) {
       throw new Error('YieldPlanet credentials not configured');
     }
   }
@@ -32,7 +32,7 @@ export class YieldPlanetService {
         method,
         url: `${this.baseUrl}${endpoint}`,
         headers: {
-          'Authorization': `Basic ${Buffer.from(`${this.username}:${this.apiKey}`).toString('base64')}`,
+          'Authorization': `Basic ${Buffer.from(`${this.username}:${this.password}`).toString('base64')}`,
           'Content-Type': 'application/json'
         },
         data

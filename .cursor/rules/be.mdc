@@ -1,0 +1,87 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# main app goul
+
+We have a ai agent at retail he sent the task to this BE to sent it to yieldplanet. or maybe we can skip the be and sent the reservation directly to yieldplanet?
+AI Agent retell → Webhook → Your BE → YieldPlanet API → Client PMS
+
+the main goul is to have one connection to YieldPlanet becouse they already have connections with 500+ PMSes so we do not have to do it.
+
+# Your rule content
+
+Booking Engine SaaS Development
+Project Overview
+Create a booking engine middleware that connects our Retell AI voicebots to YieldPlanet's API (v1.31), enabling seamless hotel reservations across 400+ PMSes without individual integrations.
+
+Core Requirements
+1. API Endpoints
+Build RESTful API with these primary endpoints:
+
+POST /api/reservations - Create new booking
+PUT /api/reservations/{id} - Modify existing booking
+GET /api/availability - Check room availability
+GET /api/properties/{id} - Get property details
+GET /api/health - Service health check
+2. Retell AI Integration
+Implement webhook receiver compatible with Retell's custom function framework:
+
+Accept POST requests from Retell AI
+Process structured JSON payloads
+Return standardized responses
+Handle authentication via API keys
+3. YieldPlanet Integration
+Create client for YieldPlanet API v1.31:
+
+Implement authentication flow
+Map our data model to YieldPlanet's schema
+Handle rate limits and retries
+Monitor connection health
+4. Data Persistence
+Design database to store:
+
+Booking transactions
+Request/response logs
+Error states
+Client configurations
+5. Error Handling
+Implement comprehensive error management:
+
+Graceful failure modes
+Detailed logging
+Retry mechanisms
+Fallback options when YieldPlanet is unavailable
+Technical Stack
+Backend: Node.js/Express or Python/FastAPI
+Database: PostgreSQL
+Hosting: AWS (ECS/Lambda)
+Monitoring: CloudWatch + Sentry
+CI/CD: GitHub Actions
+Implementation Notes
+Follow API-first design approach
+Implement request validation using JSON Schema
+Use stateless architecture for horizontal scaling
+Ensure <300ms response time for critical endpoints
+Add comprehensive logging for debugging
+Implement circuit breakers for external dependencies
+Create sandbox environment for testing
+Documentation Requirements
+OpenAPI/Swagger specification
+Integration guide for Retell AI functions
+Deployment procedures
+Error code reference
+Testing Requirements
+Unit tests with >80% coverage
+Integration tests for YieldPlanet API
+Load testing for concurrent requests
+Chaos testing for resilience
+Priority Milestones
+Working webhook endpoint accepting Retell requests
+Successful YieldPlanet API integration
+End-to-end booking flow
+Production-ready deployment with monitoring
+Reference the YieldPlanet API documentation at: https://yieldplanet.atlassian.net/wiki/spaces/YA3/pages/1843396611/OTA+BE+YieldPlanet+API+1.31
+
+Please provide weekly progress updates and raise any integration challenges immediately.
